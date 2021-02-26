@@ -38,7 +38,6 @@ function checkDatabase() {
     const store = transaction.objectStore("pending");
     //get all records from the store and set to a variable
     const getAll = store.getAll();
-    
     getAll.onsuccess = function () {
         if (getAll.result.length > 0) {
             fetch("/api/transaction/bulk", {
@@ -46,12 +45,12 @@ function checkDatabase() {
                 body: JSON.stringify(getAll.result),
                 headers: {
                     Accept: "application/json, text/plain, */*",
-                    "Content-Type": "application/json"
-            }
+                    "Content-Type": "application/json",
+            },
         })
         .then(response => response.json())
         .then(() => {
-            //iff successful, open transaction on your pending db
+            //if successful, open transaction on your pending db
             const transaction = db.transaction(["pending"], "readwrite");
             //access your pending object store
             const store = transaction.objectStore("pending");

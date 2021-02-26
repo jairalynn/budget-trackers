@@ -43,28 +43,31 @@ self.addEventListener("install", function (evt) {
 
 //fetch
 self.addEventListener("fetch", function (evt) {
-    //cache handle requests here
-    if (evt.request.url.includes("/api/")) {
+    const { url } = evt.request;
+    if (url.includes("/all") || url.includes("/find")) {
         evt.respondWith(
-            caches.open(DATA_CACHE_NAME).then(cache => {
+            caches.open(DATA_CACHE_NAME).then((cache) => {
                 return fetch(evt.request)
-                .then(response => {
+                .then((response) => {
                     if (response.status === 200) {
                         cache.put(evt.request.url, response.clone());
                     }
                     return response;
                 })
-                .catch(err => {
+                .catch((err) => {
                     return cache.match(evt.request);
                 });
-            }).catch(err => console.log(err))
+            })
+            .catch(err => console.log(err))
         );
         return;
     }
 
     evt.respondWith(
-        caches.match(evt.request).then(function (response) {
-            return response || fetch(evt.request);
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.match(evt.request).then((response) => {
+                return response || fetch(evt.request);
+            });
         })
     );
 });
