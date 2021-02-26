@@ -1,5 +1,6 @@
 let transactions = [];
 let myChart;
+let pendingTransactions = [];
 
 fetch("/api/transaction")
   .then(response => {
@@ -8,6 +9,21 @@ fetch("/api/transaction")
   .then(data => {
     // save db data on global variable
     transactions = data;
+
+    if (navigator.onLine) {
+      console.log("You're online!");
+    } else {
+      console.log("You're offline!");
+      const transaction = db.transaction(["pending"], "readonly");
+      const store = transaction.objectStore("pending");
+      const allPendingRecords = store.getAll();
+      allPendingRecords.onsuccess = function() {
+        pendingTransactions = allPendingRecords.result;
+        populateTotal();
+        populateTable();
+        populateChart();
+        }
+    }
 
     populateTotal();
     populateTable();
